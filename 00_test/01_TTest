@@ -1,0 +1,70 @@
+print("=" * 60)
+print("연습문제")
+print("=" * 60)
+"""
+name = input("이름:")
+female = input("성별(M/F)")
+age = input("나이:")
+tall = input("키:")
+
+print(f"이름:{name}, 성별:{female}, 나이:{age}, 키:{tall}")
+"""
+
+"""
+letter = input("영문 소문자를 입력하세요: ")
+
+print()
+print("소문자:", letter)
+print("대문자:", letter.upper())
+"""
+
+"""
+a = int(input())
+b = int(input())
+def result(a, b):
+    return a + b, a - b, a * b, a / b, a // b
+print(a + b, a - b, a * b, a // b, a % b)
+"""
+
+"""
+a = int(input())
+b = int(input())
+
+def result(a, b):
+    return a * a, b * 0.5
+print(a * a, b * 0.5)
+"""
+
+"""
+a = int(input())
+if 0 <= a <= 100:
+    if 90 <= a:
+        result = "A"
+    elif 80 <= a:
+        result = "B"
+    elif 70 <= a:
+        result = "C"
+    elif 60 <= a:    
+        result = "D"
+    elif 60 > a:
+        result = "F"
+    print(f"{a}점 -> {result}")
+else:
+    print("올바르게 입력 하세요")
+"""
+
+"""
+for a in range(1, 101):
+   if a % 2 == 0:
+    print(a)
+"""
+
+"""
+result = 0
+
+for a in range(1, 101):
+    if a % 3 == 0 or a % 5 != 0:
+        result += a
+
+print(result)
+"""
