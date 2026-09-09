@@ -68,3 +68,84 @@ for a in range(1, 101):
 
 print(result)
 """
+
+print("=" * 60)
+print("연습문제2")
+print("=" * 60)
+
+"""
+def bmi(weight, height):
+    height_m = height / 100
+    result = weight / (height_m * height_m)
+    return round(result, 2)
+
+weight = float(input("몸무게를 입력하세요(kg): "))
+height = float(input("키를 입력하세요(cm): "))
+
+result = bmi(weight, height)
+
+print(f"BMI: {result}")
+"""
+
+"""
+def avg():
+    total = 0
+    count = 0
+
+    while True:
+        number = input("숫자 입력 (q 입력 시 종료) : ")
+
+        if number == "q":
+            break
+
+        total += float(number)
+        count += 1
+
+    if count == 0:
+        print("---> 값이 없습니다.")
+    else:
+        print(f"---> 평균: {total / count}")
+
+
+print("========== 평균 계산기 ==========")
+avg()
+"""
+
+"""
+sentence = input("문장을 입력하세요: ")
+
+words = sentence.lower().split()
+count = {}
+
+for w in words:
+    if w in count:
+        count[w] += 1
+    else:
+        count[w] = 1
+
+print("\n[단어 빈도수 결과]")
+for w, frequency in count.items():
+    print(f"-{w}: {frequency}회")
+    """
+
+"""
+import random
+
+def lotto():
+    numbers = []
+
+    while len(numbers) < 6:
+        num = random.randint(1, 45)
+        if num not in numbers:
+            numbers.append(num)
+
+    return sorted(numbers)
+
+
+game = int(input("구매할 로또 게임 수를 입력하세요: "))
+
+print("\n[로또 번호 발급 결과]")
+
+for i in range(1, game + 1):
+    print(f"{i}게임: {lotto()}")
+"""
