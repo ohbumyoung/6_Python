@@ -70,6 +70,11 @@ for amount in [5000, 50000, -1000]:
         acc.withdraw(amount)
         print(f"{amount:,}원 출금 성공")
     except NoBalanceError as n:
-        print(n)
+        print(f"출금 실패 : {n}")
+    
     except InvalidAmountError as i:
-        print(i)
+        print(f"출금 실패 : {i}")
+
+    else:
+            print(f"출금 성공 : {amount}원")
+    
