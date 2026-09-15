@@ -7,12 +7,7 @@ from config import BASE, TIMEOUT, HEADERS
 from parsers import get_text, parse_stocks
 
 
-resp = requests.get(
-    f"{BASE}/stocks",
-    params={"sector": "S08", "market": "", "q": ""},
-    headers=HEADERS,
-    timeout=TIMEOUT
-) 
+resp = requests.get(f"{BASE}/stocks", params={"sector": "S08", "market": "", "q": ""}, headers=HEADERS, timeout=TIMEOUT) 
 resp.raise_for_status()    # 응답 코드가 200이 아니라면 예외 발생
 
 html = resp.text
