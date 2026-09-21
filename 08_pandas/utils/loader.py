@@ -3,7 +3,7 @@
 """
 import pandas as pd
 
-from utils.config import RAW_PATH, ENCODING
+from utils.config import RAW_PATH, ENCODING, path
 
 def load_csv(dedup=True):
     """
@@ -22,11 +22,32 @@ def load_csv(dedup=True):
     df['date'] = pd.to_datetime(df['date'], format='mixed')
 
     if dedup:
-        # df.drop_duplicates : subset 설정 기준 중복 데이터 제거
-        #   - subset : 중복을 제거할 기준 열
-        #   - keep   : 먼저 나온 데이터(first), 마지막 데이터(last), 모두 제거(False)
-        df = df. drop_duplicates(subset=['code','date'], keep='first')
+        # df.drop_duplicates  :  subset 설정 기준 중복 데이터 제거
+        #   - subset   : 중복을 제거할 기준 열
+        #   - keep     : 먼저 나온 데이터(first), 마지막 데이터(last), 모두 제거(False)
+        df = df.drop_duplicates(subset=['code', 'date'], keep='first')
 
     # sort_values : 제시한 컬럼 기준으로 정렬 --> 인덱스가 섞일 수 있음
-    #reset_index(drop=True) : 인덱스를 다시 0,1,2,... 로 지정해줌
-    return df.sort_values(["code","date"]).reset_index(drop=True)
+    # reset_index(drop=True) : 인덱스를 다시 0,1,2,... 로 지정해줌
+    return df.sort_values(["code", "date"]).reset_index(drop=True)
+
+def load_prices():
+    """ prices.csv 파일 읽어서 DF 반환 """
+    return pd.read_csv(path('prices.csv'), encoding=ENCODING)
+
+def load_companies(raw=False):
+    """
+        raw=True 일때는 raw-companies.csv 
+        raw=False 일때는 companies.csv 파일을 읽어서 DF 반환
+
+        companies.csv => 정제본. 결측 0.
+        raw-companies.csv => 오염본(공백,대소문자,중복,전각) 존재
+    """
+
+    if raw:
+        return pd.read_csv(path('raw-companies.csv'), 
+                           encoding=ENCODING,
+                           dtype=str, 
+                           keep_default_na=False)
+
+    return pd.read_csv(path('companies.csv'), encoding=ENCODING)
