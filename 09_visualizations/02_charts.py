@@ -65,3 +65,49 @@ ax.set_ylabel("수익률(%)")
 
 ax.tick_params(axis="x", rotation=30)
 # => x축 눈금에 글자를 3-도 기울여서 표현
+
+fig.savefig(out("05_box.png"), dpi=120)
+plt.close(fig)
+
+q1, q3 = df['ret'].quantile([0.25, 0.75])
+iqr = q3 - q1
+n_out = ((df['ret']<q1-1.5*iqr) | (df['ret']>q3+1.5*iqr)).sum()
+
+print(f"Q1 {q1:.3f} Q3 {q3:.3f} IQR {iqr:.3f}")
+print(f"범위 내 {q1-1.5*iqr} ~ {q3+1.5*iqr}")
+print(f"범위 밖 : {n_out,}건")
+# 전체 데이터를 기준으로 이상치를 선별함 -> 사실 의미가 없음
+# --> 섹터별로 이상치를 선별해줘야 함!
+
+per_sector = 0
+
+for name, g in df.groupby("sector"):
+    a, b = g["ret"].quantile([0.25, 0.75])
+    i = b - a
+    per_sector += ((g['ret'] < a -1.5 * i) | (g['ret'] > b + 1.5 * i)).sum()
+
+print(f"섹터별 실제 이상치 합 : {per_sector:,}건")
+print(n_out - per_sector)
+
+# 산점도
+
+#sample(m, random_state=시드값)
+# -> 무작위로 n행을 뽑아줌.
+sample = df.dropna(subset=["ret"]).sample(5000, random_state=42)
+
+fig, axes = plt.subplots(1,2,figsize=(13, 4.5))
+axes[0].scatter(sample['volume'], sample['ret'], s=6)
+# scatter (x,y,s=점크기)
+# s: 점 하나의 면적. 기본값: 36
+
+axes[0].set_title("산점도 (기본값)")
+axes[0].set_xlabel("거래량")
+axes[0].set_ylabel("수익률(%)")
+
+axes[1].scatter(sample['volume'], sample['ret'], s=6, alpha=0.15)
+axes[1].set_title("산점도 (투명하게)")
+axes[1].set_xlabel("거래량")
+
+fig.tight_layout()
+fig.savefig(out('06_scatter.png'), dpi=120)
+plt.close(fig)
