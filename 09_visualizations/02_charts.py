@@ -111,3 +111,27 @@ axes[1].set_xlabel("거래량")
 fig.tight_layout()
 fig.savefig(out('06_scatter.png'), dpi=120)
 plt.close(fig)
+
+# 막대 그래프 (barplot)
+
+# sns.barplot => 값을 그대로 그리지 않음
+# 같은 sector에 속한 데이터를 평균을 내서 막대 하나로 표시.
+# 합계를 표시하고자 할 땐 estimator="sum"을 지정해야 함
+# 이미 groupby로 집계한 데이터를 넘기면 평균의 평균이 될 수 있음
+
+#그림판 그리기
+fig, ax = plt.subplots(figsize=(11,4))
+
+sns.barplot(data=df, x="sector", y="ret", ax=ax)
+
+ax.axhline(0, color="gray", lw=0.8)
+ax.set_title("섹터별 평균 일간 수익률")
+ax.set_xlabel("섹터")
+ax.set_ylabel("평균 수익률(%)")
+ax.tick_params(axis="x", rotation=30)
+
+fig.savefig(out("07_bar.png"), dpi=120)
+plt.close(fig)
+
+by_sector = df.groupby("sector")["ret"].agg(["mean","std","count"])
+print(by_sector.radd(4))
