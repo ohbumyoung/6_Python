@@ -42,3 +42,4 @@ def get_engine():
 
     # pool_pre_ping : 풀에서 커넥션을 꺼낼 때, 아직 살아있는지를 한번 확인
     return create_engine(url, pool_pre_ping=True)
+
