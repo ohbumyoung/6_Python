@@ -39,7 +39,7 @@ def step1_packages():
         )
 
 def step2_env():
-        """ .enb 파일 확인"""
+        """ .env 파일 확인"""
         from dotenv import load_dotenv
 
         if not os.path.exists(".env"):
