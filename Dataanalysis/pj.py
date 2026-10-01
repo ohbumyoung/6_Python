@@ -1,3 +1,4 @@
+
 import pandas as pd
 
 # 1번 문제
@@ -7,7 +8,7 @@ df = pd.read_csv("train.csv")
 df.head()
 
 # 3번 문제
-df.info()
+
 
 # 4번 문제 (차례대로 최대값, 최소값, 평균값)
 print(df[["Age", "Fare"]].max())
@@ -25,3 +26,8 @@ age50 = df[df["Age"] >= 50]
 print(age50.shape)
 
 # 8번 문제
+
+# 9번 문제
+print(df.groupby(["Sex", "Pclass"])["Survived"].mean())
+
+# PassengerId, Survived(생존), Pclass, Name, Sex, Age, SibSp, Parch, Ticket, Fare, Cabin, Embarked
