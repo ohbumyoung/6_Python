@@ -9,8 +9,7 @@ df = pd.read_csv("train.csv")
 
 # 2번 문제 
 #.head()의 기본값은 5이기 때문에 숫자를 안썼습니다.
-df.head()
-
+print(df.head())
 
 # 3번 문제
 df.info()
@@ -22,9 +21,9 @@ df.info()
 """
 
 # 4번 문제 (차례대로 최대값, 최소값, 평균값)
-print(df[["Age", "Fare"]].max())
-print(df[["Age", "Fare"]].min())
-print(df[["Age", "Fare"]].mean())
+print(df[["Age", "Fare"]].max().round(2))
+print(df[["Age", "Fare"]].min().round(2))
+print(df[["Age", "Fare"]].mean().round(2))
 
 # 5번 문제
 print(df["Survived"].value_counts())
@@ -56,20 +55,19 @@ def age_group(age):
     else:
         return "60대 이상"
 df["AgeGroup"] = df["Age"].apply(age_group)
+print(df[["Age", "AgeGroup"]].head())  
 
 # 9번 문제
-print(df.groupby(["Sex", "Pclass"])["Survived"].mean())
+print(df.groupby(["Sex", "Pclass"])["Survived"].mean().round(2))
 
 # 10번 문제
 print(df.groupby("AgeGroup")["Survived"].mean().round(2))
 
 # 11번 문제
-# 맨 밑 부분은 따로 볼 수 있게 만들었습니다.
-NaN = df.isnull().sum()
-result = NaN / 891 * 100
-NaN_df = pd.DataFrame({"결측수": NaN, "비율(%)": result})
+nan = df.isnull().sum()
+result = (nan / 891 * 100).round(2)
+NaN_df = pd.DataFrame({"결측수": nan, "비율(%)": result})
 print(NaN_df.sort_values("결측수", ascending=False)) 
-#print(result.sort_values(ascending=False), NaN.sort_values(ascending=False))
 
 # 12번 문제 
 # .map함수를 사용하여 풀었습니다.
@@ -77,28 +75,28 @@ df["Gender_Encoded"] = df["Sex"].map({"male":0, "female":1})
 print(df["Gender_Encoded"])
 
 # 13번 문제
-print(df.groupby(["Embarked"])["Fare"].mean())
+print(df.groupby(["Embarked"])["Fare"].mean().round(2))
 
 # 14번 문제
-pivot = df.pivot_table(index="Pclass", columns="Sex", values="Fare", aggfunc="mean")
+pivot = df.pivot_table(index="Pclass", columns="Sex", values="Fare", aggfunc="mean").round(2)
 print(pivot)
 
 # 15번 문제 
 # 가족수에 본인을 포함시켜 +1을 사용했습니다.
 df["FamilySize"] = df["SibSp"] + df["Parch"] + 1
-print(df["FamilySize"].describe())
+print(df["FamilySize"].describe().round(2))
 
 
 # 16번 문제
 df["Title"] = df["Name"].str.extract(r', ([A-Za-z]+)\.')
-print(df["Title"].head())
+print(df["Title"].value_counts().head())
 
 # 17번 문제
 title_mean = df.groupby("Title").agg(
     승객수=("PassengerId", "count"),   
     평균나이=("Age", "mean"),
     평균생존율=("Survived", "mean"),
-)
+).round(2)
 print(title_mean)
 
 # 18번 문제
