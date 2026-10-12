@@ -1,27 +1,34 @@
 """
     데이터 로드, 피처 생성 등 기능 모아두는 모듈
 """
-import pandas as pd
 import numpy as np
+import pandas as pd
 from _config import path, prices_path, ENCODING
 
 SEED = 42
 
 def load_merged():
-    """ prices, companise, sectors를 결합하여 반환 """
-    prices = pd.read_csv(prices_path(), encoding=ENCODING, parse_dates=["date"])
+    """ prices, companies, sectors를 결합하여 반환 """
+    prices = pd.read_csv(prices_path(),
+                         encoding=ENCODING,
+                         parse_dates=["date"])
+    companies = pd.read_csv(path("companies.csv"),
+                            encoding=ENCODING)
+    sectors = (pd.read_csv(path("sectors.csv"), encoding=ENCODING)
+                .rename(columns={"code":"sectorCode", "name":"sectorName"}))
 
-    companies = pd.read_csv(path("companies.csv"), encoding=ENCODING)
-    sectors = pd.read_csv(path("sectors.csv"), encoding=ENCODING).rename(columns={"code":"sectorCode", "name":"sectorName"})
-    df = (
-        prices.merge(companies[["code", "name", "sectorCode", "market"]], how="left", on="code", validate="many_to_one")
-              .merge(sectors[["sectorCode","sectorName"]], how="left", on="sectorCode",validate="many_to_one")
+    df = ( prices
+            .merge(companies[["code", "name", "sectorCode", "market"]],
+                   how="left", on="code", validate="many_to_one")
+            .merge(sectors[["sectorCode", "sectorName"]],
+                   how="left", on="sectorCode", validate="many_to_one")
           )
+
     return df.sort_values(["code", "date"]).reset_index(drop=True)
 
-# -----------------------------------
+# ----------------------------------
 # 피처 생성
-#------------------------------------
+# ----------------------------------
 FEATURES = [
     "ret_1d",        # 전일 수익률
     "ret_5d",        # 5일 수익률
@@ -34,30 +41,32 @@ FEATURES = [
 
 def add_features(df, shift_features=True):
     """
-        features를 생성하여 반환
+        피처를 생성하여 반환
 
         Args
             df : 데이터셋
             shift_features : 모든 피처를 한 칸씩 밀건지 여부
-            - True일 때 "어제까지의 정보로 오늘을 예측" 모든 피처를 한 칸씩 밀어준다.
-            - False일 때 그대로 사용한다. -> 데이터 누수.
+            - True : "어제까지의 정보로 오늘을 예측" 모든 피처를 한 칸씩 밀어줌.
+            - False : 그대로 사용. 오늘 종가로 만든 피처가 포함 -> 데이터 누수.
         Return
-            df (features가 추가된 데이터 셋)
+            df (피처가 추가된 데이터셋)
     """
     df = df.sort_values(["code", "date"]).copy()
 
-    g = df.groupby("code")  # 종목코드별로 그룹화하여 계산하기 위해
+    g = df.groupby("code")    # 종목코드별로 그룹화하여 계산하기 위해 
 
-    df["ret_1d"] = g["close"].transform(lambda s : s.pct_change())  # s.pct_change(기본값이 1이다.)
-    df["ret_5d"] = g["close"].transform(lambda s : s.pct_change(5))
+    df["ret_1d"] = g["close"].transform(lambda s: s.pct_change())
+    df["ret_5d"] = g["close"].transform(lambda s: s.pct_change(5))
 
-    df["ma5_ratio"] = df["close"] / g["close"].transform(lambda s : s.rolling(5).mean())
-    df["ma20_ratio"] = df["close"] / g["close"].transform(lambda s : s.rolling(20).mean())
+    df["ma5_ratio"] = df["close"] / g["close"].transform(lambda s: s.rolling(5).mean())
+    df["ma20_ratio"] = df["close"] / g["close"].transform(lambda s: s.rolling(20).mean())
 
-    df["vol20"] = g["close"].transform(lambda s : s.pct_change().rolling(20).std()) 
-    df["volume_ratio"] = df["volume"] / g["volume"].transform(lambda s : s.rolling(20).mean())
+    df["vol20"] = g["close"].transform(lambda s: s.pct_change().rolling(20).std())
 
-    df["range_pct"] = (df["high"] - df["low"]) / df["low"]  * 100
+    df["volume_ratio"] = df["volume"] / g["volume"].transform(lambda s: s.rolling(20).mean())
+
+    df["range_pct"] = (df["high"] - df["low"]) / df["low"] * 100
+
 
     if shift_features:
         for col in FEATURES:
@@ -66,13 +75,13 @@ def add_features(df, shift_features=True):
     return df
 
 def add_target(df):
-    """
+    """ 
         정답 데이터 생성
-        - 예측 대상 : 오늘의 수익률
-          * target_ret = 오늘 종가 / 어제 종가 - 1
-          * target_up = 올랐는지 여부 (0/1)
-    """
 
+        - 예측 대상: 오늘의 수익률
+          * target_ret = 오늘 종가 / 어제 종가 - 1
+          * target_up  = 올랐는지 여부 (0/1)
+    """
     df = df.sort_values(["code", "date"]).copy()
 
     df["target_ret"] = df.groupby("code")["close"].pct_change()
@@ -82,9 +91,10 @@ def add_target(df):
 
 def build_dataset(shift_features=True):
     """
-        features와 정답이 준비된 데이터를 반환
+        피처와 정답이 준비된 데이터를 반환
     """
     df = load_merged()
+
     df = add_features(df, shift_features=shift_features)
     df = add_target(df)
 
@@ -97,12 +107,13 @@ def build_dataset(shift_features=True):
     return df
 
 def time_split(df, test_size=0.2):
-    """ 시계열 데이터를 학습용, 테스용으로 분리하여 반환 
+    """ 
+        시계열 데이터를 학습용, 테스트용으로 분리하여 반환 
         Args.
             df : 시계열 데이터 프레임 (날짜타입 열을 포함한 df)
             test_size : 테스트용 데이터 비율 (0.2 -> 학습 8: 테스트2)
-        Return
-            분리된_학습용_데이터, 분리된_테스트용_데이터, 분리기준값
+        Return.
+            분리된_학습용_데이터,분리된_테스트용_데이터, 분리기준값
     """
     cutoff = df["date"].quantile(1 - test_size)
 
