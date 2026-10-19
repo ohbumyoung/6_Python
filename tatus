@@ -1,0 +1,16 @@
+D	13_dl/01_karas.ipynb
+A	13_dl/01_keras.ipynb
+A	13_dl/__pycache__/_config.cpython-311.pyc
+A	13_dl/__pycache__/_ml.cpython-311.pyc
+A	13_dl/__pycache__/_style.cpython-311.pyc
+A	13_dl/_config.py
+A	13_dl/_ml.py
+A	13_dl/_style.py
+A	13_dl/models/surge_features.pkl
+A	13_dl/models/surge_nn.keras
+A	13_dl/models/surge_scaler.pkl
+A	20261016pratice/pokemon_alopez247.csv
+D	ex/data/raw-bikes.csv
+D	ex/data/raw-rentals.csv
+D	ex/data/stations.csv
+D	ex/make_clean_rentals.py
